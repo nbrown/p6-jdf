@@ -42,4 +42,7 @@ is $page7<Centered>, False, 'page 7 not centered';
 is $page7<Offsets>, { X => 0, Y => 0 }, 'page 7 runlist offsets';
 is $page7<Scaling>, { X => 100, Y => 100 }, 'page 7 scaling';
 
+is Jdf::ResourcePool::parseOffset("27 -11"), {X => 10, Y => -4}, 'parseOffset';
+is Jdf::ResourcePool::parseScaling("0.97 0.85"), {X => 97, Y => 85}, 'scaling';
+
 # vim: ft=perl6

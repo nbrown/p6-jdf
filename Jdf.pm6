@@ -79,15 +79,15 @@ class Jdf::ResourcePool is Jdf::Pool {
         return @s;
     }
 
-    sub parseOffset($offset) {
+    our sub parseOffset($offset) {
         my @sets = $offset.split(' ');
         @sets = (0, 0) if $offset eq "0";
         return { X => Jdf::mm(@sets[0]), Y => Jdf::mm(@sets[1]) };
     }
 
-    sub parseScaling($scaling) {
+    our sub parseScaling($scaling) {
         my @sc = $scaling.split(' ');
-        return { X => @sc[0]*100, Y => @sc[0]*100 };
+        return { X => @sc[0]*100, Y => @sc[1]*100 };
     }
 }
 
