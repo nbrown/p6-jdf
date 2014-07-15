@@ -32,4 +32,14 @@ is $jdf.ResourcePool.Layout<Signatures>.elems, 1, '1 signature';
 is $jdf.ResourcePool.Layout<Signatures>[0]<Name>, "1", 'signature name';
 is $jdf.ResourcePool.Layout<Signatures>[0]<PressRun>, 1, 'signature run';
 
+my $runlist = $jdf.ResourcePool.Runlist;
+is $runlist.elems, 28, '28 files';
+my $page7 = $runlist[7 - 1];
+is $page7<Page>, 7, 'is page 7';
+is $page7<Url>.basename, '007-NEW%20WORLD%20FULLPAGE.pdf', 'page 7 filename';
+is $page7<CenterOffset>, {X => 0, Y => 0}, 'page 7 center offset';
+is $page7<Centered>, False, 'page 7 not centered';
+is $page7<Offsets>, { X => 0, Y => 0 }, 'page 7 runlist offsets';
+is $page7<Scaling>, { X => 100, Y => 100 }, 'page 7 scaling';
+
 # vim: ft=perl6
