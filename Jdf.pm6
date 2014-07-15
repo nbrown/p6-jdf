@@ -2,48 +2,48 @@ use v6;
 use XML;
 
 role Jdf::Pool {
-	has XML::Element $.Pool;
+    has XML::Element $.Pool;
 
-	method new(XML::Element $Pool) {
-		return self.bless(:$Pool);
-	}
+    method new(XML::Element $Pool) {
+        return self.bless(:$Pool);
+    }
 
-	method getNodes(XML::Element $xml, Str $name) {
-		return $xml.getElementsByTagName($name);
-	}
+    method getNodes(XML::Element $xml, Str $name) {
+        return $xml.getElementsByTagName($name);
+    }
 }
 
 class Jdf::AuditPool is Jdf::Pool {
-	method Created {
-		my $c = self.getNodes($.Pool, "Created")[0];
-		return {
-			AgentName => $c<AgentName>,
-			AgentVersion => $c<AgentVersion>,
-			TimeStamp => DateTime.new($c<TimeStamp>)
-		};
-	}
+    method Created {
+        my $c = self.getNodes($.Pool, "Created")[0];
+        return {
+            AgentName => $c<AgentName>,
+            AgentVersion => $c<AgentVersion>,
+            TimeStamp => DateTime.new($c<TimeStamp>)
+        };
+    }
 }
 
 class Jdf::ResourcePool is Jdf::Pool {
-	method ColorantOrder {
-		my $co = self.getNodes($.Pool, "ColorantOrder")[0];
-		my @ss = self.getNodes($co, "SeparationSpec");
-		return @ss.map(*<Name>);
-	}
+    method ColorantOrder {
+        my $co = self.getNodes($.Pool, "ColorantOrder")[0];
+        my @ss = self.getNodes($co, "SeparationSpec");
+        return @ss.map(*<Name>);
+    }
 
-	method Layout {
-		my $layout = self.getNodes($.Pool, "Layout")[0];
-		my @pa = $layout<SSi:JobPageAdjustments>.split(' ');
-		my @sigs = self.getNodes($layout, "Signature");
-		return {
-			Bleed => Jdf::mm($layout<SSi:JobDefaultBleedMargin>),
-			PageAdjustments => {
-				Odd => { X => Jdf::mm(@pa[0]), Y => Jdf::mm(@pa[1]) },
-				Even => { X => Jdf::mm(@pa[2]), Y => Jdf::mm(@pa[3]) }
-			},
-			Signatures => parseSignatures(@sigs),
-		};
-	}
+    method Layout {
+        my $layout = self.getNodes($.Pool, "Layout")[0];
+        my @pa = $layout<SSi:JobPageAdjustments>.split(' ');
+        my @sigs = self.getNodes($layout, "Signature");
+        return {
+            Bleed => Jdf::mm($layout<SSi:JobDefaultBleedMargin>),
+            PageAdjustments => {
+                Odd => { X => Jdf::mm(@pa[0]), Y => Jdf::mm(@pa[1]) },
+                Even => { X => Jdf::mm(@pa[2]), Y => Jdf::mm(@pa[3]) }
+            },
+            Signatures => parseSignatures(@sigs),
+        };
+    }
 
     method Runlist {
         my $runlist = self.getNodes($.Pool, "RunList")[0];
@@ -68,34 +68,34 @@ class Jdf::ResourcePool is Jdf::Pool {
         return @files;
     }
 
-	sub parseSignatures(@signatures) {
-		my @s;
-		for @signatures {
-			my %sig =
-				Name => $_<Name>,
-				PressRun => $_<SSi:PressRunNo>.Int
-			;
-			@s.push: {%sig};
-		}
-		return @s;
-	}
+    sub parseSignatures(@signatures) {
+        my @s;
+        for @signatures {
+            my %sig =
+                Name => $_<Name>,
+                PressRun => $_<SSi:PressRunNo>.Int
+            ;
+            @s.push: {%sig};
+        }
+        return @s;
+    }
 }
 
 class Jdf {
-	has XML::Document $.jdf;
-	has Jdf::AuditPool $.AuditPool;
-	has Jdf::ResourcePool $.ResourcePool;
+    has XML::Document $.jdf;
+    has Jdf::AuditPool $.AuditPool;
+    has Jdf::ResourcePool $.ResourcePool;
 
-	method new(Str $jdf-xml) returns Jdf {
-		my XML::Document $jdf = from-xml($jdf-xml);
-		my Jdf::AuditPool $AuditPool .= new(self.getPool($jdf, "AuditPool"));
-		my Jdf::ResourcePool $ResourcePool .= new(self.getPool($jdf, "ResourcePool"));
-		return self.bless(:$jdf, :$AuditPool, :$ResourcePool);
-	}
+    method new(Str $jdf-xml) returns Jdf {
+        my XML::Document $jdf = from-xml($jdf-xml);
+        my Jdf::AuditPool $AuditPool .= new(self.getPool($jdf, "AuditPool"));
+        my Jdf::ResourcePool $ResourcePool .= new(self.getPool($jdf, "ResourcePool"));
+        return self.bless(:$jdf, :$AuditPool, :$ResourcePool);
+    }
 
-	method getPool(XML::Document $xml, Str $name) {
-		return $xml.getElementsByTagName($name)[0];
-	}
+    method getPool(XML::Document $xml, Str $name) {
+        return $xml.getElementsByTagName($name)[0];
+    }
 
     our proto mm($pts) { * }
 
