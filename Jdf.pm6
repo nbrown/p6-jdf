@@ -57,7 +57,7 @@ class Jdf::ResourcePool is Jdf::Pool {
                 Run => $root<Run>,
                 Page => $root<Run> + 1,
                 Url => IO::Path.new($filespec<URL>),
-                CenterOffset => $pagecell<SSi:RunListCenterOffset>,
+                CenterOffset => parseOffset($pagecell<SSi:RunListCenterOffset>),
                 Centered =>
                     $pagecell<SSi:RunListCentered> == 0 ?? False !! True,
                 Offsets => parseOffset($pagecell<SSi:RunListOffsets>),
@@ -81,6 +81,7 @@ class Jdf::ResourcePool is Jdf::Pool {
 
     sub parseOffset($offset) {
         my @sets = $offset.split(' ');
+        @sets = (0, 0) if $offset eq "0";
         return { X => @sets[0], Y => @sets[1] };
     }
 
