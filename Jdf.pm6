@@ -10,13 +10,17 @@ role Jdf::Pool {
 }
 
 class Jdf::AuditPool is Jdf::Pool {
+    has %!created;
+
     method Created returns Hash {
+        return %!created if %!created;
         my XML::Element $c = Jdf::get($.Pool, "Created");
-        return {
+        %!created =
             AgentName => $c<AgentName>,
             AgentVersion => $c<AgentVersion>,
             TimeStamp => DateTime.new($c<TimeStamp>)
-        };
+        ;
+        return %!created;
     }
 }
 
