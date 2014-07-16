@@ -2,6 +2,8 @@ use v6;
 use Test;
 use Jdf;
 
+plan 7;
+
 my $jdf = Jdf.new(slurp('t/MultiSigTest.jdf'));
 
 is $jdf.ResourcePool.Layout<Signatures>.elems, 5, '5 signatures';

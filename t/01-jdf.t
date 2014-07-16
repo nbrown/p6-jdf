@@ -2,6 +2,8 @@ use v6;
 use Test;
 use Jdf;
 
+plan 31;
+
 is Jdf::mm(14.1732), 5.0, 'convert points to mm';
 is Jdf::mm("14.1732"), 5.0, 'convert str points to mm';
 is Jdf::mm(-14.1732), -5.0, 'convert negative points to mm';
