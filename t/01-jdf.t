@@ -1,21 +1,21 @@
 use v6;
 use Test;
-use Jdf;
+use Printing::Jdf;
 
 plan 31;
 
-is Jdf::mm(14.1732), 5.0, 'convert points to mm';
-is Jdf::mm("14.1732"), 5.0, 'convert str points to mm';
-is Jdf::mm(-14.1732), -5.0, 'convert negative points to mm';
-is Jdf::mm("-14.1732"), -5.0, 'convert negative str points to mm';
-is Jdf::mm(42), 15, 'convert pt to mm';
-is Jdf::mm(5), 2, 'pearl';
-is Jdf::mm(12), 4, 'pica';
-is Jdf::mm(24), 8, 'double pica';
-is Jdf::mm(48), 17, 'canon';
-is Jdf::mm(72), (25.4).round, '1 inch';
+is Printing::Jdf::mm(14.1732), 5.0, 'convert points to mm';
+is Printing::Jdf::mm("14.1732"), 5.0, 'convert str points to mm';
+is Printing::Jdf::mm(-14.1732), -5.0, 'convert negative points to mm';
+is Printing::Jdf::mm("-14.1732"), -5.0, 'convert negative str points to mm';
+is Printing::Jdf::mm(42), 15, 'convert pt to mm';
+is Printing::Jdf::mm(5), 2, 'pearl';
+is Printing::Jdf::mm(12), 4, 'pica';
+is Printing::Jdf::mm(24), 8, 'double pica';
+is Printing::Jdf::mm(48), 17, 'canon';
+is Printing::Jdf::mm(72), (25.4).round, '1 inch';
 
-my Jdf $jdf = Jdf.new(slurp('t/TestJobFile.jdf'));
+my Printing::Jdf $jdf = Printing::Jdf.new(slurp('t/TestJobFile.jdf'));
 
 is $jdf.AuditPool.Created<AgentName>, 'Kodak Preps', 'agent name is correct';
 is $jdf.AuditPool.Created<AgentVersion>,'5.3.3  (595)','agent version correct';
@@ -44,7 +44,7 @@ is $page7<Centered>, False, 'page 7 not centered';
 is $page7<Offsets>, { X => 0, Y => 0 }, 'page 7 runlist offsets';
 is $page7<Scaling>, { X => 100, Y => 100 }, 'page 7 scaling';
 
-is Jdf::ResourcePool::parseOffset("27 -11"), {X => 10, Y => -4}, 'parseOffset';
-is Jdf::ResourcePool::parseScaling("0.97 0.85"), {X => 97, Y => 85}, 'scaling';
+is Printing::Jdf::ResourcePool::parseOffset("27 -11"), {X => 10, Y => -4}, 'parseOffset';
+is Printing::Jdf::ResourcePool::parseScaling("0.97 0.85"), {X => 97, Y => 85}, 'scaling';
 
 # vim: ft=perl6

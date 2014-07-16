@@ -1,7 +1,7 @@
 use v6;
 use XML;
 
-role Jdf::Pool {
+role Printing::Jdf::Pool {
     has XML::Element $.Pool;
 
     method new(XML::Element $Pool) {
@@ -9,12 +9,12 @@ role Jdf::Pool {
     }
 }
 
-class Jdf::AuditPool is Jdf::Pool {
+class Printing::Jdf::AuditPool is Printing::Jdf::Pool {
     has %!created;
 
     method Created returns Hash {
         return %!created if %!created;
-        my XML::Element $c = Jdf::get($.Pool, "Created");
+        my XML::Element $c = Printing::Jdf::get($.Pool, "Created");
         %!created =
             AgentName => $c<AgentName>,
             AgentVersion => $c<AgentVersion>,
@@ -24,29 +24,29 @@ class Jdf::AuditPool is Jdf::Pool {
     }
 }
 
-class Jdf::ResourcePool is Jdf::Pool {
+class Printing::Jdf::ResourcePool is Printing::Jdf::Pool {
     has @!colorantOrder;
     has %!layout;
     has @!runlist;
 
     method ColorantOrder returns List {
         return @!colorantOrder if @!colorantOrder;
-        my XML::Element $co = Jdf::get($.Pool, <ColorantOrder>, Recurse => 1);
-        my XML::Element @ss = Jdf::get($co, <SeparationSpec>, Single => False);
+        my XML::Element $co = Printing::Jdf::get($.Pool, <ColorantOrder>, Recurse => 1);
+        my XML::Element @ss = Printing::Jdf::get($co, <SeparationSpec>, Single => False);
         @!colorantOrder = @ss.map(*<Name>);
         return @!colorantOrder;
     }
 
     method Layout returns Hash {
         return %!layout if %!layout;
-        my XML::Element $layout = Jdf::get($.Pool, <Layout>);
+        my XML::Element $layout = Printing::Jdf::get($.Pool, <Layout>);
         my Str @pa = $layout<SSi:JobPageAdjustments>.split(' ');
-        my XML::Element @sigs = Jdf::get($layout, <Signature>, Single => False);
+        my XML::Element @sigs = Printing::Jdf::get($layout, <Signature>, Single => False);
         %!layout =
-            Bleed => Jdf::mm($layout<SSi:JobDefaultBleedMargin>),
+            Bleed => Printing::Jdf::mm($layout<SSi:JobDefaultBleedMargin>),
             PageAdjustments => {
-                Odd => { X => Jdf::mm(@pa[0]), Y => Jdf::mm(@pa[1]) },
-                Even => { X => Jdf::mm(@pa[2]), Y => Jdf::mm(@pa[3]) }
+                Odd => { X => Printing::Jdf::mm(@pa[0]), Y => Printing::Jdf::mm(@pa[1]) },
+                Even => { X => Printing::Jdf::mm(@pa[2]), Y => Printing::Jdf::mm(@pa[3]) }
             },
             Signatures => parseSignatures(@sigs)
         ;
@@ -55,13 +55,13 @@ class Jdf::ResourcePool is Jdf::Pool {
 
     method Runlist returns Array {
         return @!runlist if @!runlist;
-        my XML::Element $runlist = Jdf::get($.Pool, <RunList>);
-        my XML::Element @runlists = Jdf::get($runlist, <RunList>, Single => False);
+        my XML::Element $runlist = Printing::Jdf::get($.Pool, <RunList>);
+        my XML::Element @runlists = Printing::Jdf::get($runlist, <RunList>, Single => False);
         my @files;
         for @runlists -> $root {
-            my XML::Element $layout = Jdf::get($root, <LayoutElement>);
-            my XML::Element $pagecell = Jdf::get($root, <SSi:PageCell>);
-            my XML::Element $filespec = Jdf::get($layout, <FileSpec>);
+            my XML::Element $layout = Printing::Jdf::get($root, <LayoutElement>);
+            my XML::Element $pagecell = Printing::Jdf::get($root, <SSi:PageCell>);
+            my XML::Element $filespec = Printing::Jdf::get($layout, <FileSpec>);
             @files.push: {
                 Run => $root<Run>,
                 Page => $root<Run> + 1,
@@ -80,8 +80,8 @@ class Jdf::ResourcePool is Jdf::Pool {
     sub parseSignatures(@signatures) returns Array {
         my Hash @s;
         for @signatures {
-            my $eit = Jdf::get($_, <SSi:ExternalImpositionTemplate>);
-            my $fs = Jdf::get($eit, <FileSpec>);
+            my $eit = Printing::Jdf::get($_, <SSi:ExternalImpositionTemplate>);
+            my $fs = Printing::Jdf::get($eit, <FileSpec>);
             my %sig =
                 Name => $_<Name>,
                 PressRun => $_<SSi:PressRunNo>.Int,
@@ -95,7 +95,7 @@ class Jdf::ResourcePool is Jdf::Pool {
     our sub parseOffset($offset) returns Hash {
         my Str @sets = $offset.split(' ');
         @sets = ('0', '0') if $offset eq "0";
-        return { X => Jdf::mm(@sets[0]), Y => Jdf::mm(@sets[1]) };
+        return { X => Printing::Jdf::mm(@sets[0]), Y => Printing::Jdf::mm(@sets[1]) };
     }
 
     our sub parseScaling($scaling) returns Hash {
@@ -104,15 +104,15 @@ class Jdf::ResourcePool is Jdf::Pool {
     }
 }
 
-class Jdf {
+class Printing::Jdf {
     has XML::Document $.jdf;
-    has Jdf::AuditPool $.AuditPool;
-    has Jdf::ResourcePool $.ResourcePool;
+    has Printing::Jdf::AuditPool $.AuditPool;
+    has Printing::Jdf::ResourcePool $.ResourcePool;
 
-    method new(Str $jdf-xml) returns Jdf {
+    method new(Str $jdf-xml) returns Printing::Jdf {
         my XML::Document $jdf = from-xml($jdf-xml);
-        my Jdf::AuditPool $AuditPool .= new(getPool($jdf, "AuditPool"));
-        my Jdf::ResourcePool $ResourcePool .= new(getPool($jdf, "ResourcePool"));
+        my Printing::Jdf::AuditPool $AuditPool .= new(getPool($jdf, "AuditPool"));
+        my Printing::Jdf::ResourcePool $ResourcePool .= new(getPool($jdf, "ResourcePool"));
         return self.bless(:$jdf, :$AuditPool, :$ResourcePool);
     }
 

@@ -1,10 +1,10 @@
 use v6;
 use Test;
-use Jdf;
+use Printing::Jdf;
 
 plan 7;
 
-my $jdf = Jdf.new(slurp('t/MultiSigTest.jdf'));
+my $jdf = Printing::Jdf.new(slurp('t/MultiSigTest.jdf'));
 
 is $jdf.ResourcePool.Layout<Signatures>.elems, 5, '5 signatures';
 is $jdf.ResourcePool.Layout<Signatures>[3 - 1]<PressRun>, 3, 'is run 3';
