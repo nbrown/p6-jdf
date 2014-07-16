@@ -25,27 +25,36 @@ class Jdf::AuditPool is Jdf::Pool {
 }
 
 class Jdf::ResourcePool is Jdf::Pool {
+    has @!colorantOrder;
+    has %!layout;
+    has @!runlist;
+
     method ColorantOrder returns List {
+        return @!colorantOrder if @!colorantOrder;
         my XML::Element $co = Jdf::get($.Pool, <ColorantOrder>, Recurse => 1);
         my XML::Element @ss = Jdf::get($co, <SeparationSpec>, Single => False);
-        return @ss.map(*<Name>);
+        @!colorantOrder = @ss.map(*<Name>);
+        return @!colorantOrder;
     }
 
     method Layout returns Hash {
+        return %!layout if %!layout;
         my XML::Element $layout = Jdf::get($.Pool, <Layout>);
         my Str @pa = $layout<SSi:JobPageAdjustments>.split(' ');
         my XML::Element @sigs = Jdf::get($layout, <Signature>, Single => False);
-        return {
+        %!layout =
             Bleed => Jdf::mm($layout<SSi:JobDefaultBleedMargin>),
             PageAdjustments => {
                 Odd => { X => Jdf::mm(@pa[0]), Y => Jdf::mm(@pa[1]) },
                 Even => { X => Jdf::mm(@pa[2]), Y => Jdf::mm(@pa[3]) }
             },
             Signatures => parseSignatures(@sigs)
-        };
+        ;
+        return %!layout;
     }
 
     method Runlist returns Array {
+        return @!runlist if @!runlist;
         my XML::Element $runlist = Jdf::get($.Pool, <RunList>);
         my XML::Element @runlists = Jdf::get($runlist, <RunList>, Single => False);
         my @files;
@@ -64,7 +73,8 @@ class Jdf::ResourcePool is Jdf::Pool {
                 Scaling => parseScaling($pagecell<SSi:RunListScaling>)
             };
         }
-        return @files;
+        @!runlist = @files;
+        return @!runlist;
     }
 
     sub parseSignatures(@signatures) returns Array {
