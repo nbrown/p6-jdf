@@ -1,5 +1,5 @@
 use v6;
-use Jdf;
+use Printing::Jdf;
 
 if not @*ARGS {
     say "Usage:";
@@ -7,7 +7,7 @@ if not @*ARGS {
     exit(0);
 }
 
-my $jdf = Jdf.new(slurp(@*ARGS[0]));
+my $jdf = Printing::Jdf.new(slurp(@*ARGS[0]));
 my $option = @*ARGS[1];
 
 say "Templates:";
