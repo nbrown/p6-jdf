@@ -10,8 +10,8 @@ role Jdf::Pool {
 }
 
 class Jdf::AuditPool is Jdf::Pool {
-    method Created {
-        my $c = Jdf::get($.Pool, "Created");
+    method Created returns Hash {
+        my XML::Element $c = Jdf::get($.Pool, "Created");
         return {
             AgentName => $c<AgentName>,
             AgentVersion => $c<AgentVersion>,
@@ -21,16 +21,16 @@ class Jdf::AuditPool is Jdf::Pool {
 }
 
 class Jdf::ResourcePool is Jdf::Pool {
-    method ColorantOrder {
-        my $co = Jdf::get($.Pool, <ColorantOrder>, Recurse => 1);
-        my @ss = Jdf::get($co, <SeparationSpec>, Single => False);
+    method ColorantOrder returns List {
+        my XML::Element $co = Jdf::get($.Pool, <ColorantOrder>, Recurse => 1);
+        my XML::Element @ss = Jdf::get($co, <SeparationSpec>, Single => False);
         return @ss.map(*<Name>);
     }
 
-    method Layout {
-        my $layout = Jdf::get($.Pool, <Layout>);
-        my @pa = $layout<SSi:JobPageAdjustments>.split(' ');
-        my @sigs = Jdf::get($layout, <Signature>, Single => False);
+    method Layout returns Hash {
+        my XML::Element $layout = Jdf::get($.Pool, <Layout>);
+        my Str @pa = $layout<SSi:JobPageAdjustments>.split(' ');
+        my XML::Element @sigs = Jdf::get($layout, <Signature>, Single => False);
         return {
             Bleed => Jdf::mm($layout<SSi:JobDefaultBleedMargin>),
             PageAdjustments => {
@@ -41,14 +41,14 @@ class Jdf::ResourcePool is Jdf::Pool {
         };
     }
 
-    method Runlist {
-        my $runlist = Jdf::get($.Pool, <RunList>);
-        my @runlists = Jdf::get($runlist, <RunList>, Single => False);
+    method Runlist returns Array {
+        my XML::Element $runlist = Jdf::get($.Pool, <RunList>);
+        my XML::Element @runlists = Jdf::get($runlist, <RunList>, Single => False);
         my @files;
         for @runlists -> $root {
-            my $layout = Jdf::get($root, <LayoutElement>);
-            my $pagecell = Jdf::get($root, <SSi:PageCell>);
-            my $filespec = Jdf::get($layout, <FileSpec>);
+            my XML::Element $layout = Jdf::get($root, <LayoutElement>);
+            my XML::Element $pagecell = Jdf::get($root, <SSi:PageCell>);
+            my XML::Element $filespec = Jdf::get($layout, <FileSpec>);
             @files.push: {
                 Run => $root<Run>,
                 Page => $root<Run> + 1,
@@ -63,8 +63,8 @@ class Jdf::ResourcePool is Jdf::Pool {
         return @files;
     }
 
-    sub parseSignatures(@signatures) {
-        my @s;
+    sub parseSignatures(@signatures) returns Array {
+        my Hash @s;
         for @signatures {
             my $eit = Jdf::get($_, <SSi:ExternalImpositionTemplate>);
             my $fs = Jdf::get($eit, <FileSpec>);
@@ -78,14 +78,14 @@ class Jdf::ResourcePool is Jdf::Pool {
         return @s;
     }
 
-    our sub parseOffset($offset) {
-        my @sets = $offset.split(' ');
-        @sets = (0, 0) if $offset eq "0";
+    our sub parseOffset($offset) returns Hash {
+        my Str @sets = $offset.split(' ');
+        @sets = ('0', '0') if $offset eq "0";
         return { X => Jdf::mm(@sets[0]), Y => Jdf::mm(@sets[1]) };
     }
 
-    our sub parseScaling($scaling) {
-        my @sc = $scaling.split(' ');
+    our sub parseScaling($scaling) returns Hash {
+        my Str @sc = $scaling.split(' ');
         return { X => @sc[0]*100, Y => @sc[1]*100 };
     }
 }
@@ -106,21 +106,21 @@ class Jdf {
         return $xml.elements(:$TAG, SINGLE => $Single, RECURSE => $Recurse);
     }
 
-    sub getPool(XML::Document $xml, Str $name) {
+    sub getPool(XML::Document $xml, Str $name) returns XML::Element {
         return $xml.elements(TAG => $name, :SINGLE);
     }
 
-    our proto mm($pts) { * }
+    our proto mm($pts) returns Int { * }
 
-    our multi sub mm(Str $pts) {
+    our multi sub mm(Str $pts) returns Int {
         mm($pts.Rat);
     }
 
-    our multi sub mm(Int $pts) {
+    our multi sub mm(Int $pts) returns Int {
         mm($pts.Rat);
     }
 
-    our multi sub mm(Rat $pts) {
+    our multi sub mm(Rat $pts) returns Int {
         my Rat constant $inch = 25.4;
         my Rat constant $mm = $inch / 72;
         return ($mm * $pts).round;
