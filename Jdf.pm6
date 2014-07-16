@@ -104,7 +104,7 @@ class Jdf {
     }
 
     method getPool(XML::Document $xml, Str $name) {
-        return $xml.getElementsByTagName($name)[0];
+        return $xml.elements(TAG => $name, :SINGLE);
     }
 
     our proto mm($pts) { * }
