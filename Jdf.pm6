@@ -37,7 +37,7 @@ class Jdf::ResourcePool is Jdf::Pool {
                 Odd => { X => Jdf::mm(@pa[0]), Y => Jdf::mm(@pa[1]) },
                 Even => { X => Jdf::mm(@pa[2]), Y => Jdf::mm(@pa[3]) }
             },
-            Signatures => parseSignatures(@sigs),
+            Signatures => parseSignatures(@sigs)
         };
     }
 
@@ -66,9 +66,12 @@ class Jdf::ResourcePool is Jdf::Pool {
     sub parseSignatures(@signatures) {
         my @s;
         for @signatures {
+            my $eit = Jdf::get($_, <SSi:ExternalImpositionTemplate>);
+            my $fs = Jdf::get($eit, <FileSpec>);
             my %sig =
                 Name => $_<Name>,
-                PressRun => $_<SSi:PressRunNo>.Int
+                PressRun => $_<SSi:PressRunNo>.Int,
+                Template => IO::Path.new($fs<URL>)
             ;
             @s.push: {%sig};
         }
