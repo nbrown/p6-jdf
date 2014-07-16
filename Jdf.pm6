@@ -7,15 +7,11 @@ role Jdf::Pool {
     method new(XML::Element $Pool) {
         return self.bless(:$Pool);
     }
-
-    method getNodes(XML::Element $xml, Str $name) {
-        return $xml.getElementsByTagName($name);
-    }
 }
 
 class Jdf::AuditPool is Jdf::Pool {
     method Created {
-        my $c = self.getNodes($.Pool, "Created")[0];
+        my $c = Jdf::get($.Pool, "Created");
         return {
             AgentName => $c<AgentName>,
             AgentVersion => $c<AgentVersion>,
@@ -26,15 +22,15 @@ class Jdf::AuditPool is Jdf::Pool {
 
 class Jdf::ResourcePool is Jdf::Pool {
     method ColorantOrder {
-        my $co = self.getNodes($.Pool, "ColorantOrder")[0];
-        my @ss = self.getNodes($co, "SeparationSpec");
+        my $co = Jdf::get($.Pool, <ColorantOrder>, Recurse => 1);
+        my @ss = Jdf::get($co, <SeparationSpec>, Single => False);
         return @ss.map(*<Name>);
     }
 
     method Layout {
-        my $layout = self.getNodes($.Pool, "Layout")[0];
+        my $layout = Jdf::get($.Pool, <Layout>);
         my @pa = $layout<SSi:JobPageAdjustments>.split(' ');
-        my @sigs = self.getNodes($layout, "Signature");
+        my @sigs = Jdf::get($layout, <Signature>, Single => False);
         return {
             Bleed => Jdf::mm($layout<SSi:JobDefaultBleedMargin>),
             PageAdjustments => {
@@ -46,13 +42,13 @@ class Jdf::ResourcePool is Jdf::Pool {
     }
 
     method Runlist {
-        my $runlist = self.getNodes($.Pool, "RunList")[0];
-        my @runlists = self.getNodes($runlist, "RunList");
+        my $runlist = Jdf::get($.Pool, <RunList>);
+        my @runlists = Jdf::get($runlist, <RunList>, Single => False);
         my @files;
         for @runlists -> $root {
-            my $layout = self.getNodes($root, "LayoutElement")[0];
-            my $filespec = self.getNodes($layout, "FileSpec")[0];
-            my $pagecell = self.getNodes($root, "SSi:PageCell")[0];
+            my $layout = Jdf::get($root, <LayoutElement>);
+            my $pagecell = Jdf::get($root, <SSi:PageCell>);
+            my $filespec = Jdf::get($layout, <FileSpec>);
             @files.push: {
                 Run => $root<Run>,
                 Page => $root<Run> + 1,
@@ -98,12 +94,16 @@ class Jdf {
 
     method new(Str $jdf-xml) returns Jdf {
         my XML::Document $jdf = from-xml($jdf-xml);
-        my Jdf::AuditPool $AuditPool .= new(self.getPool($jdf, "AuditPool"));
-        my Jdf::ResourcePool $ResourcePool .= new(self.getPool($jdf, "ResourcePool"));
+        my Jdf::AuditPool $AuditPool .= new(getPool($jdf, "AuditPool"));
+        my Jdf::ResourcePool $ResourcePool .= new(getPool($jdf, "ResourcePool"));
         return self.bless(:$jdf, :$AuditPool, :$ResourcePool);
     }
 
-    method getPool(XML::Document $xml, Str $name) {
+    our sub get(XML::Element $xml, Str $TAG, Bool :$Single = True,Int :$Recurse = 0) {
+        return $xml.elements(:$TAG, SINGLE => $Single, RECURSE => $Recurse);
+    }
+
+    sub getPool(XML::Document $xml, Str $name) {
         return $xml.elements(TAG => $name, :SINGLE);
     }
 
