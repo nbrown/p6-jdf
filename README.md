@@ -26,7 +26,7 @@ Converts Pts to Millimetres, rounded to the closest millimetre
 
 ### Printing::Jdf::AuditPool ###
 
-#### Created ####
+#### .Created ####
 
 Returns a Hash with the following keys:
 
@@ -36,11 +36,11 @@ Returns a Hash with the following keys:
 
 ### Printing::Jdf::ResourcePool ###
 
-#### ColorantOrder ####
+#### .ColorantOrder ####
 
 Returns a List of Strings of the names of the colours in the document
 
-#### Layout ####
+#### .Layout ####
 
 Returns a Hash with the following keys:
 
@@ -58,7 +58,7 @@ Returns a Hash with the following keys:
             <Int> PressRun => the number of the press run
             <IO::Path> Template => an IO::Path object of the template file
 
-#### Runlist ####
+#### .Runlist ####
 
 Returns an Array of Hashes representing each page in the runlist
 
