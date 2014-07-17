@@ -12,63 +12,63 @@ SSi extensions.
 
 ### Printing::Jdf ###
 
-#### Auditpool ####
+#### .Auditpool ####
 
-    Returns a Printing::Jdf::AuditPool object for the provided JDF file
+Returns a Printing::Jdf::AuditPool object for the provided JDF file
 
-#### ResourcePool ####
+#### .ResourcePool ####
 
-    Returns a Printing::Jdf::ResourcePool object for the provided JDF file
+Returns a Printing::Jdf::ResourcePool object for the provided JDF file
 
-#### ::mm ####
+#### ::mm (Str, Int, Rat) --> Int ####
 
-    Converts Pts to Millimetres, rounded to the closest millimetre
+Converts Pts to Millimetres, rounded to the closest millimetre
 
 ### Printing::Jdf::AuditPool ###
 
 #### Created ####
 
-    Returns a Hash with the following keys:
+Returns a Hash with the following keys:
 
-    * `AgentName` - the name of the generator used to create the JDF file
-    * `AgentVersion` - the version of the generator
-    * `TimeStamp` - a DateTime object representing the date the file was created
+    <Str>   AgentName => the name of the generator used to create the JDF file
+    <Str>   AgentVersion => the version of the generator
+    <DateTime> TimeStamp => object representing the date the file was created
 
 ### Printing::Jdf::ResourcePool ###
 
 #### ColorantOrder ####
 
-    Returns a List of Strings of the names of the colours in the document
+Returns a List of Strings of the names of the colours in the document
 
 #### Layout ####
 
-    Returns a Hash with the following keys:
+Returns a Hash with the following keys:
 
-    * `Bleed` - the amount of bleed used in the document, in millimetres
-    * `PageAdjustments` - a Hash representing the page offsets
-        `Odd` - odd page offsets
-            `X` - horizontal offset
-            `Y` - vertical offset
-        `Even` - even page offsets
-            `X` - horizontal offset
-            `Y` - vertical offset
-    * `Signatures` - an array of the Signatures in the document
+    <Int> Bleed => the amount of bleed used in the document, in millimetres
+    PageAdjustments => a Hash representing the page offsets
+        Odd => odd page offsets
+            <Int> X => horizontal offset
+            <Int> Y => vertical offset
+        Even => even page offsets
+            <Int> X => horizontal offset
+            <Int> Y => vertical offset
+    Signatures => an array of the Signatures in the document
         Each Signature is a Hash containing the following keys:
-            `Name` - the name of the signature
-            `PressRun` - the number of the press run
-            `Template` - an IO::Path object of the template file
+            <Str> Name => the name of the signature
+            <Int> PressRun => the number of the press run
+            <IO::Path> Template => an IO::Path object of the template file
 
 #### Runlist ####
 
-    Returns an Array of Hashes representing each page in the runlist
+Returns an Array of Hashes representing each page in the runlist
 
-    * `Run` - the run number of the page
-    * `Page` - the page number
-    * `Url` - a IO::Path object for the file
-    * `Centered` - a Bool that is True if the page is centered
-    * `Offsets` - a Hash of the page offsets in millimetres
+    <Int> Run => the run number of the page
+    <Int> Page => the page number
+    <IO::Path> Url => a IO::Path object for the file
+    <Bool> Centered => a Bool that is True if the page is centered
+    Offsets => a Hash of the page offsets in millimetres
         see Layout<PageAdjustments>
-    * `Scaling` - a Hash with the keys `X` and `Y` representing the scaling percentage of the page
+    Scaling => a Hash with the keys <X> and <Y> representing the scaling percentage of the page
 
 ## License ##
 
