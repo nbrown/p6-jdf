@@ -8,6 +8,10 @@ SSi extensions.
     my $xml = slurp('/path/to/file.jdf');
     my $jdf = Printing::Jdf.new($xml);
 
+See the [imposition.pl6](imposition.pl6) script for an example of using
+this module to list the templates, adjustments and page details from a
+JDF file.
+
 ## Documentation ##
 
 ### Printing::Jdf ###
