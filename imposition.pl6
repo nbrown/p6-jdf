@@ -37,8 +37,8 @@ sub offsets {
     say "Offsets:";
     my $adj = $jdf.ResourcePool.Layout<PageAdjustments>;
     say "\tX\tY";
-    say "Odd:\t" ~ $adj<Odd><X> ~ "\t" ~ $adj<Odd><Y>;
-    say "Even:\t" ~ $adj<Even><X> ~ "\t" ~ $adj<Even><Y>;
+    say "Odd:\t" ~ get_adjustments($adj<Odd>);
+    say "Even:\t" ~ get_adjustments($adj<Even>);
     blank();
 }
 
@@ -56,6 +56,10 @@ sub pages {
             blank();
         }
     }
+}
+
+sub get_adjustments($adj) {
+    return $adj<X> ~ "\t" ~ $adj<Y>;
 }
 
 sub unurl($s) {
