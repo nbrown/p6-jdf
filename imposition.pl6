@@ -47,7 +47,7 @@ else {
         print $page<Scaling><X> ~ 'x' ~ $page<Scaling><Y> ~ "\t";
         print $page<Offsets><X> ~ '/' ~ $page<Offsets><Y> ~ "\t";
         print "CENTERED" if $page<Centered>;
-        say "";
+        blank();
     }
 }
 
