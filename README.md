@@ -76,6 +76,6 @@ Returns an Array of Hashes representing each page in the runlist
 
 ## License ##
 
-This module is licensed under the terms of the Mozilla Public License 2.0.
+This module is licensed under the terms of the ISC License.
 
 Adobe, Kodak, Preps and Creo are trademarks of their respective owners.
