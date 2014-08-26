@@ -3,9 +3,11 @@ use Printing::Jdf;
 
 =begin LICENSE
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
+Copyright (c) 2014, carlin <cb@viennan.net>
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
 
 =end LICENSE
 
