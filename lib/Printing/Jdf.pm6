@@ -89,7 +89,7 @@ class Printing::Jdf::ResourcePool is Printing::Jdf::Pool {
                     $pagecell<SSi:RunListCentered> == 0 ?? False !! True,
                 Offsets => parseOffset($pagecell<SSi:RunListOffsets>),
                 Scaling => parseScaling($pagecell<SSi:RunListScaling>),
-				IsBlank => $layout<IsBlank>
+				IsBlank => $layout.attribs<IsBlank>:exists
             };
         }
         @!runlist = @files;
