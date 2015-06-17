@@ -9,8 +9,6 @@ my Printing::Jdf $jdf = Printing::Jdf.new(slurp('t/BlankPageTest.jdf'));
 my $runlist = $jdf.ResourcePool.Runlist;
 my $page2 = $runlist[2 - 1];
 
-say $page2.perl;
-
 is $page2<Url>.basename, 'Blank Page', 'page name is "Blank Page"';
 is $page2<IsBlank>, True, 'attribute indicates page is blank';
 
