@@ -7,5 +7,5 @@
     "provides" : {
         "Printing::Jdf" : "lib/Printing/Jdf.pm6"
     },
-    "source-url" : "git://github.com/carbin/p6-jdf.git"
+    "source-url" : "git://github.com/nbrown/p6-jdf.git"
 }
